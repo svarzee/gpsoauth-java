@@ -26,14 +26,8 @@ public class Gpsoauth {
 
   public Response performMasterLogin(String username, String password, String androidId) throws IOException {
     return performMasterLogin(
-        username,
-        password,
-        androidId,
-        "ac2dm",
-        "us",
-        "us",
-        "en",
-        "17");
+        username, password, androidId, "ac2dm", "us", "us", "en", "17"
+    );
   }
 
   public Response performMasterLogin(String username,
@@ -78,7 +72,22 @@ public class Gpsoauth {
   }
 
   public String performMasterLoginForToken(String username, String password, String androidId) throws IOException, TokenRequestFailed {
-    Response response = performMasterLogin(username, password, androidId);
+    return performMasterLoginForToken(
+        username, password, androidId, "ac2dm", "us", "us", "en", "17"
+    );
+  }
+
+  public String performMasterLoginForToken(String username,
+                                           String password,
+                                           String androidId,
+                                           String service,
+                                           String deviceCountry,
+                                           String operatorCountry,
+                                           String lang,
+                                           String sdkVersion) throws IOException, TokenRequestFailed {
+    Response response = performMasterLogin(
+        username, password, androidId, service, deviceCountry, operatorCountry, lang, sdkVersion
+    );
     String responseStr = response.body().string();
     if (response.code() != 200 || !responseStr.contains("Token=")) throw new TokenRequestFailed();
     return responseStr.replaceAll("(\n|.)*?Token=(.*)?\n(\n|.)*", "$2");
