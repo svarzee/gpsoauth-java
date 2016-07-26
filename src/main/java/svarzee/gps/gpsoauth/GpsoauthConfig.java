@@ -2,16 +2,17 @@ package svarzee.gps.gpsoauth;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.Properties;
 
 class GpsoauthConfig {
-  final String modulus;
-  final String exponent;
+  private final BigInteger modulus;
+  private final BigInteger exponent;
 
   GpsoauthConfig(String configFile) {
     Properties properties = getProperties();
-    this.modulus = properties.getProperty("modulus");
-    this.exponent = properties.getProperty("exponent");
+    this.modulus = new BigInteger(properties.getProperty("modulus"));
+    this.exponent = new BigInteger(properties.getProperty("exponent"));
   }
 
   private Properties getProperties() {
@@ -24,11 +25,11 @@ class GpsoauthConfig {
     }
   }
 
-  public String getModulus() {
+  public BigInteger getModulus() {
     return modulus;
   }
 
-  public String getExponent() {
+  public BigInteger getExponent() {
     return exponent;
   }
 }

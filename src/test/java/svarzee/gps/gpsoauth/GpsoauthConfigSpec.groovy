@@ -9,8 +9,8 @@ class GpsoauthConfigSpec extends Specification {
         when:
         def config = new GpsoauthConfig(configFile)
         then:
-        config.modulus == '13'
-        config.exponent == '7'
+        config.modulus == BigInteger.valueOf(13)
+        config.exponent == BigInteger.valueOf(7)
     }
 
 }
