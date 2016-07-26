@@ -19,6 +19,11 @@ public class Gpsoauth {
     this.httpClient = httpClient;
   }
 
+  public String login(String username, String password) throws IOException, TokenRequestFailed {
+    String masterToken = performMasterLoginForToken(username, password);
+    return performOAuthForToken(username, masterToken);
+  }
+
   public Response performMasterLogin(String username, String password) throws IOException {
     byte[] signature = cipherUtil
         .createSignature(
