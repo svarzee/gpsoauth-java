@@ -2,6 +2,8 @@ package svarzee.gps.gpsoauth
 
 import spock.lang.Specification
 
+import static svarzee.gps.gpsoauth.test.TestUtil.TEST_PROPS
+
 class GpsoauthConfigSpec extends Specification {
     def "should load the config"() {
         given:
@@ -9,8 +11,8 @@ class GpsoauthConfigSpec extends Specification {
         when:
         def config = new GpsoauthConfig(configFile)
         then:
-        config.modulus == BigInteger.valueOf(13)
-        config.exponent == BigInteger.valueOf(7)
+        config.modulus == new BigInteger(TEST_PROPS.modulus)
+        config.exponent == new BigInteger(TEST_PROPS.exponent)
     }
 
 }
