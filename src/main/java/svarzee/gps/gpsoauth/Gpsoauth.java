@@ -106,7 +106,7 @@ public class Gpsoauth {
     Request request = new Request.Builder()
         .url("https://android.clients.google.com/auth")
         .post(formBody)
-        .header("User-Agent", "gpsoauth/0.3.0")
+        .header("User-Agent", "gpsoauth/0.1")
         .build();
 
     return httpClient.newCall(request).execute();
