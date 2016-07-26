@@ -12,11 +12,17 @@ public class Gpsoauth {
 
   private final CipherUtil cipherUtil = new CipherUtil();
   private final GpsoauthConfig config = new GpsoauthConfig("gpsoauth.properties");
+  private final String userAgent;
 
   private final OkHttpClient httpClient;
 
   public Gpsoauth(OkHttpClient httpClient) {
+    this(httpClient, "gpsoauth/0.1");
+  }
+
+  public Gpsoauth(OkHttpClient httpClient, String userAgent) {
     this.httpClient = httpClient;
+    this.userAgent = userAgent;
   }
 
   public String login(String username,
@@ -70,7 +76,7 @@ public class Gpsoauth {
     Request request = new Request.Builder()
         .url("https://android.clients.google.com/auth")
         .post(formBody)
-        .header("User-Agent", "gpsoauth/0.1")
+        .header("User-Agent", userAgent)
         .build();
 
     return httpClient.newCall(request).execute();
@@ -140,7 +146,7 @@ public class Gpsoauth {
     Request request = new Request.Builder()
         .url("https://android.clients.google.com/auth")
         .post(formBody)
-        .header("User-Agent", "gpsoauth/0.1")
+        .header("User-Agent", userAgent)
         .build();
 
     return httpClient.newCall(request).execute();
