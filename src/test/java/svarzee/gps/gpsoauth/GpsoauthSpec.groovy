@@ -17,6 +17,12 @@ class GpsoauthSpec extends Specification {
     String validPassword = TEST_PROPS.validPassword
     @Shared
     String androidId = TEST_PROPS.androidId
+    @Shared
+    String service = TEST_PROPS.service
+    @Shared
+    String app = TEST_PROPS.app
+    @Shared
+    String clientSig = TEST_PROPS.clientSig
 
 
     def "should return 200 ok for master login with valid credentials"() {
@@ -59,7 +65,7 @@ class GpsoauthSpec extends Specification {
         given:
         def masterToken = gpsoauth.performMasterLoginForToken(validUsername, validPassword, androidId)
         when:
-        def response = gpsoauth.performOAuth(validUsername, masterToken)
+        def response = gpsoauth.performOAuth(validUsername, masterToken, androidId, service, app, clientSig)
         then:
         response.code() == 200
     }
@@ -68,7 +74,7 @@ class GpsoauthSpec extends Specification {
         given:
         def masterToken = gpsoauth.performMasterLoginForToken(validUsername, validPassword, androidId)
         when:
-        def response = gpsoauth.performOAuth(validUsername, masterToken)
+        def response = gpsoauth.performOAuth(validUsername, masterToken, androidId, service, app, clientSig)
         then:
         response.body().string().contains("Auth=")
     }
@@ -76,14 +82,14 @@ class GpsoauthSpec extends Specification {
 
     def "should return 403 forbidden for oath with invalid master token"() {
         when:
-        def response = gpsoauth.performOAuth(validUsername, "some_invalid_master_token")
+        def response = gpsoauth.performOAuth(validUsername, "some_invalid_master_token", androidId, service, app, clientSig)
         then:
         response.code() == 403
     }
 
     def "should throw TokenRequestFailed for oath token request with invalid master token"() {
         when:
-        gpsoauth.performOAuthForToken(validUsername, "some_invalid_master_token")
+        gpsoauth.performOAuthForToken(validUsername, "some_invalid_master_token", androidId, service, app, clientSig)
         then:
         thrown(TokenRequestFailed)
     }

@@ -19,9 +19,14 @@ public class Gpsoauth {
     this.httpClient = httpClient;
   }
 
-  public String login(String username, String password, String androidId) throws IOException, TokenRequestFailed {
+  public String login(String username,
+                      String password,
+                      String androidId,
+                      String service,
+                      String app,
+                      String clientSig) throws IOException, TokenRequestFailed {
     String masterToken = performMasterLoginForToken(username, password, androidId);
-    return performOAuthForToken(username, masterToken);
+    return performOAuthForToken(username, masterToken, androidId, service, app, clientSig);
   }
 
   public Response performMasterLogin(String username, String password, String androidId) throws IOException {
@@ -93,7 +98,27 @@ public class Gpsoauth {
     return responseStr.replaceAll("(\n|.)*?Token=(.*)?\n(\n|.)*", "$2");
   }
 
-  public Response performOAuth(String username, String masterToken) throws IOException {
+  public Response performOAuth(String username,
+                               String masterToken,
+                               String androidId,
+                               String service,
+                               String app,
+                               String clientSig) throws IOException {
+    return performOAuth(
+        username, masterToken, androidId, service, app, clientSig, "us", "us", "en", "17"
+    );
+  }
+
+  public Response performOAuth(String username,
+                               String masterToken,
+                               String androidId,
+                               String service,
+                               String app,
+                               String clientSig,
+                               String deviceCountry,
+                               String operatorCountry,
+                               String lang,
+                               String sdkVersion) throws IOException {
     OkHttpClient httpClient = new OkHttpClient();
 
     FormBody formBody = new FormBody.Builder()
@@ -101,15 +126,15 @@ public class Gpsoauth {
         .add("Email", username)
         .add("has_permission", "1")
         .add("EncryptedPasswd", masterToken)
-        .add("service", "audience:server:client_id:848232511240-7so421jotr2609rmqakceuu1luuq0ptb.apps.googleusercontent.com")
+        .add("service", service)
         .add("source", "android")
-        .add("androidId", "9774d56d682e549c")
-        .add("app", "com.nianticlabs.pokemongo")
-        .add("client_sig", "321187995bc7cdc2b5fc91b11a96e2baa8602c62")
-        .add("device_country", "us")
-        .add("operatorCountry", "us")
-        .add("lang", "en")
-        .add("sdk_version", "17")
+        .add("androidId", androidId)
+        .add("app", app)
+        .add("client_sig", clientSig)
+        .add("device_country", deviceCountry)
+        .add("operatorCountry", operatorCountry)
+        .add("lang", lang)
+        .add("sdk_version", sdkVersion)
         .build();
 
     Request request = new Request.Builder()
@@ -121,8 +146,30 @@ public class Gpsoauth {
     return httpClient.newCall(request).execute();
   }
 
-  public String performOAuthForToken(String username, String masterToken) throws IOException, TokenRequestFailed {
-    Response response = performOAuth(username, masterToken);
+  public String performOAuthForToken(String username,
+                                     String masterToken,
+                                     String androidId,
+                                     String service,
+                                     String app,
+                                     String clientSig) throws IOException, TokenRequestFailed {
+    return performOAuthForToken(
+        username, masterToken, androidId, service, app, clientSig, "us", "us", "en", "17"
+    );
+  }
+
+  public String performOAuthForToken(String username,
+                                     String masterToken,
+                                     String androidId,
+                                     String service,
+                                     String app,
+                                     String clientSig,
+                                     String deviceCountry,
+                                     String operatorCountry,
+                                     String lang,
+                                     String sdkVersion) throws IOException, TokenRequestFailed {
+    Response response = performOAuth(
+        username, masterToken, androidId, service, app, clientSig, deviceCountry, operatorCountry, lang, sdkVersion
+    );
     String responseStr = response.body().string();
     if (response.code() != 200 || !responseStr.contains("Auth=")) throw new TokenRequestFailed();
     return responseStr.replaceAll("(\n|.)*?Auth=(.*)?\n(\n|.)*", "$2");
