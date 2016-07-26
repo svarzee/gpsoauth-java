@@ -19,12 +19,31 @@ public class Gpsoauth {
     this.httpClient = httpClient;
   }
 
-  public String login(String username, String password) throws IOException, TokenRequestFailed {
-    String masterToken = performMasterLoginForToken(username, password);
+  public String login(String username, String password, String androidId) throws IOException, TokenRequestFailed {
+    String masterToken = performMasterLoginForToken(username, password, androidId);
     return performOAuthForToken(username, masterToken);
   }
 
-  public Response performMasterLogin(String username, String password) throws IOException {
+  public Response performMasterLogin(String username, String password, String androidId) throws IOException {
+    return performMasterLogin(
+        username,
+        password,
+        androidId,
+        "ac2dm",
+        "us",
+        "us",
+        "en",
+        "17");
+  }
+
+  public Response performMasterLogin(String username,
+                                     String password,
+                                     String androidId,
+                                     String service,
+                                     String deviceCountry,
+                                     String operatorCountry,
+                                     String lang,
+                                     String sdkVersion) throws IOException {
     byte[] signature = cipherUtil
         .createSignature(
             username,
@@ -40,13 +59,13 @@ public class Gpsoauth {
         .add("has_permission", "1")
         .add("add_account", "1")
         .add("EncryptedPasswd", b64Signature)
-        .add("service", "ac2dm")
+        .add("service", service)
         .add("source", "android")
-        .add("androidId", "9774d56d682e549c")
-        .add("device_country", "us")
-        .add("operatorCountry", "us")
-        .add("lang", "en")
-        .add("sdk_version", "17")
+        .add("androidId", androidId)
+        .add("device_country", deviceCountry)
+        .add("operatorCountry", operatorCountry)
+        .add("lang", lang)
+        .add("sdk_version", sdkVersion)
         .build();
 
     Request request = new Request.Builder()
@@ -58,8 +77,8 @@ public class Gpsoauth {
     return httpClient.newCall(request).execute();
   }
 
-  public String performMasterLoginForToken(String username, String password) throws IOException, TokenRequestFailed {
-    Response response = performMasterLogin(username, password);
+  public String performMasterLoginForToken(String username, String password, String androidId) throws IOException, TokenRequestFailed {
+    Response response = performMasterLogin(username, password, androidId);
     String responseStr = response.body().string();
     if (response.code() != 200 || !responseStr.contains("Token=")) throw new TokenRequestFailed();
     return responseStr.replaceAll("(\n|.)*?Token=(.*)?\n(\n|.)*", "$2");
