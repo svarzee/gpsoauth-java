@@ -70,15 +70,16 @@ class GpsoauthSpec extends Specification {
         response.code() == 200
     }
 
-    def "should return response with `Auth` value for oauth with valid master token"() {
+    def "should return response with `Auth` and `Expiry` values for oauth with valid master token"() {
         given:
         def masterToken = gpsoauth.performMasterLoginForToken(validUsername, validPassword, androidId)
         when:
         def response = gpsoauth.performOAuth(validUsername, masterToken, androidId, service, app, clientSig)
+        def bodyStr = response.body().string()
         then:
-        response.body().string().contains("Auth=")
+        bodyStr.contains("Auth=")
+        bodyStr.contains("Expiry=")
     }
-
 
     def "should return 403 forbidden for oath with invalid master token"() {
         when:

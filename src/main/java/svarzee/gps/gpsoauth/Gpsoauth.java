@@ -8,6 +8,8 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.util.Base64;
 
+import static java.lang.Long.parseLong;
+
 public class Gpsoauth {
 
   private final CipherUtil cipherUtil = new CipherUtil();
@@ -25,12 +27,12 @@ public class Gpsoauth {
     this.userAgent = userAgent;
   }
 
-  public String login(String username,
-                      String password,
-                      String androidId,
-                      String service,
-                      String app,
-                      String clientSig) throws IOException, TokenRequestFailed {
+  public AuthToken login(String username,
+                         String password,
+                         String androidId,
+                         String service,
+                         String app,
+                         String clientSig) throws IOException, TokenRequestFailed {
     String masterToken = performMasterLoginForToken(username, password, androidId);
     return performOAuthForToken(username, masterToken, androidId, service, app, clientSig);
   }
@@ -152,33 +154,35 @@ public class Gpsoauth {
     return httpClient.newCall(request).execute();
   }
 
-  public String performOAuthForToken(String username,
-                                     String masterToken,
-                                     String androidId,
-                                     String service,
-                                     String app,
-                                     String clientSig) throws IOException, TokenRequestFailed {
+  public AuthToken performOAuthForToken(String username,
+                                        String masterToken,
+                                        String androidId,
+                                        String service,
+                                        String app,
+                                        String clientSig) throws IOException, TokenRequestFailed {
     return performOAuthForToken(
         username, masterToken, androidId, service, app, clientSig, "us", "us", "en", "17"
     );
   }
 
-  public String performOAuthForToken(String username,
-                                     String masterToken,
-                                     String androidId,
-                                     String service,
-                                     String app,
-                                     String clientSig,
-                                     String deviceCountry,
-                                     String operatorCountry,
-                                     String lang,
-                                     String sdkVersion) throws IOException, TokenRequestFailed {
+  public AuthToken performOAuthForToken(String username,
+                                        String masterToken,
+                                        String androidId,
+                                        String service,
+                                        String app,
+                                        String clientSig,
+                                        String deviceCountry,
+                                        String operatorCountry,
+                                        String lang,
+                                        String sdkVersion) throws IOException, TokenRequestFailed {
     Response response = performOAuth(
         username, masterToken, androidId, service, app, clientSig, deviceCountry, operatorCountry, lang, sdkVersion
     );
     String responseStr = response.body().string();
     if (response.code() != 200 || !responseStr.contains("Auth=")) throw new TokenRequestFailed();
-    return responseStr.replaceAll("(\n|.)*?Auth=(.*)?\n(\n|.)*", "$2");
+    String token = responseStr.replaceAll("(\n|.)*?Auth=(.*)?\n(\n|.)*", "$2");
+    String expiry = responseStr.replaceAll("(\n|.)*?Expiry=(.*)?\n(\n|.)*", "$2");
+    return new AuthToken(token, parseLong(expiry));
   }
 
   public static class TokenRequestFailed extends Exception {
