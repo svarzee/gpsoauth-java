@@ -6,7 +6,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.util.Base64;
+import android.util.Base64;
 
 import static java.lang.Long.parseLong;
 
@@ -58,7 +58,7 @@ public class Gpsoauth {
             config.getModulus(),
             config.getExponent()
         );
-    String b64Signature = Base64.getUrlEncoder().encodeToString(signature);
+    String b64Signature = Base64.encodeToString(signature, Base64.URL_SAFE);
 
     FormBody formBody = new FormBody.Builder()
         .add("accountType", "HOSTED_OR_GOOGLE")
