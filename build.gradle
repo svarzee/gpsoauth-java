@@ -3,6 +3,7 @@ version '0.2.0'
 
 apply plugin: 'java'
 apply plugin: 'groovy'
+apply plugin: 'checkstyle'
 
 sourceCompatibility = 1.8
 
@@ -14,4 +15,8 @@ dependencies {
     compile "com.squareup.okhttp3:okhttp:3.4.1"
 
     testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
+}
+
+checkstyle {
+    toolVersion = '7.0'
 }
