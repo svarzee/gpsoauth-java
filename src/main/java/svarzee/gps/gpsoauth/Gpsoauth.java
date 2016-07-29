@@ -1,14 +1,15 @@
 package svarzee.gps.gpsoauth;
 
 import java.io.IOException;
-import java.util.Base64;
 
+import net.iharder.Base64;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 import static java.lang.Long.parseLong;
+import static net.iharder.Base64.URL_SAFE;
 
 public class Gpsoauth {
 
@@ -59,7 +60,7 @@ public class Gpsoauth {
             config.getModulus(),
             config.getExponent()
         );
-    String b64Signature = Base64.getUrlEncoder().encodeToString(signature);
+    String b64Signature = Base64.encodeBytes(signature, URL_SAFE);
 
     FormBody formBody = new FormBody.Builder()
         .add("accountType", "HOSTED_OR_GOOGLE")

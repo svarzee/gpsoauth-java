@@ -1,11 +1,11 @@
 group 'svarzee.gps'
-version '0.2.1'
+version '0.3.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'checkstyle'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.7
 
 repositories {
     mavenCentral()
@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     compile "com.squareup.okhttp3:okhttp:3.4.1"
+    compile "net.iharder:base64:2.3.9"
 
     testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
 }
