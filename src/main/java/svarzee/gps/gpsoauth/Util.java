@@ -11,7 +11,6 @@ class Util {
     Matcher matcher = Pattern.compile(format("(\n|^)%s=(.*)?(\n|$)", key))
         .matcher(responseBody);
     return matcher.find()
-
         ? Try.of(matcher.group(2))
         : failure();
   }
