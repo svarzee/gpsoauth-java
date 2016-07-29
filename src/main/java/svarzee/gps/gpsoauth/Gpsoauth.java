@@ -12,6 +12,7 @@ import static java.lang.Long.parseLong;
 
 public class Gpsoauth {
 
+  private final Util util = new Util();
   private final CipherUtil cipherUtil = new CipherUtil();
   private final GpsoauthConfig config = new GpsoauthConfig("gpsoauth.properties");
   private final String userAgent;
@@ -101,9 +102,11 @@ public class Gpsoauth {
     Response response = performMasterLogin(
         username, password, androidId, service, deviceCountry, operatorCountry, lang, sdkVersion
     );
-    String responseStr = response.body().string();
-    if (response.code() != 200 || !responseStr.contains("Token=")) throw new TokenRequestFailed();
-    return responseStr.replaceAll("(\n|.)*?Token=(.*)?\n(\n|.)*", "$2");
+    if (response.code() != 200) throw new TokenRequestFailed();
+    String responseBody = response.body().string();
+    Try<String> token = util.extractValue(responseBody, "Token");
+    if (token.isFailure()) throw new TokenRequestFailed();
+    else return token.get();
   }
 
   public Response performOAuth(String username,
@@ -178,11 +181,12 @@ public class Gpsoauth {
     Response response = performOAuth(
         username, masterToken, androidId, service, app, clientSig, deviceCountry, operatorCountry, lang, sdkVersion
     );
-    String responseStr = response.body().string();
-    if (response.code() != 200 || !responseStr.contains("Auth=")) throw new TokenRequestFailed();
-    String token = responseStr.replaceAll("(\n|.)*?Auth=(.*)?\n(\n|.)*", "$2");
-    String expiry = responseStr.replaceAll("(\n|.)*?Expiry=(.*)?\n(\n|.)*", "$2");
-    return new AuthToken(token, parseLong(expiry));
+    if (response.code() != 200) throw new TokenRequestFailed();
+    String responseBody = response.body().string();
+    Try<String> token = util.extractValue(responseBody, "Auth");
+    Try<String> expiry = util.extractValue(responseBody, "Expiry");
+    if (token.isFailure() || expiry.isFailure()) throw new TokenRequestFailed();
+    return new AuthToken(token.get(), parseLong(expiry.get()));
   }
 
   public static class TokenRequestFailed extends Exception {
