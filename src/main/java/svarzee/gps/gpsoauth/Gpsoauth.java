@@ -100,14 +100,13 @@ public class Gpsoauth {
                                            String operatorCountry,
                                            String lang,
                                            String sdkVersion) throws IOException, TokenRequestFailed {
-    Response response = performMasterLogin(
-        username, password, androidId, service, deviceCountry, operatorCountry, lang, sdkVersion
-    );
-    if (response.code() != 200) throw new TokenRequestFailed();
-    String responseBody = response.body().string();
-    Try<String> token = util.extractValue(responseBody, "Token");
-    if (token.isFailure()) throw new TokenRequestFailed();
-    else return token.get();
+    try (Response response = performMasterLogin(username, password, androidId, service, deviceCountry, operatorCountry, lang, sdkVersion)) {
+      if (response.code() != 200) throw new TokenRequestFailed();
+      String responseBody = response.body().string();
+      Try<String> token = util.extractValue(responseBody, "Token");
+      if (token.isFailure()) throw new TokenRequestFailed();
+      else return token.get();
+    }
   }
 
   public Response performOAuth(String username,
@@ -179,15 +178,16 @@ public class Gpsoauth {
                                         String operatorCountry,
                                         String lang,
                                         String sdkVersion) throws IOException, TokenRequestFailed {
-    Response response = performOAuth(
+    try (Response response = performOAuth(
         username, masterToken, androidId, service, app, clientSig, deviceCountry, operatorCountry, lang, sdkVersion
-    );
-    if (response.code() != 200) throw new TokenRequestFailed();
-    String responseBody = response.body().string();
-    Try<String> token = util.extractValue(responseBody, "Auth");
-    Try<String> expiry = util.extractValue(responseBody, "Expiry");
-    if (token.isFailure() || expiry.isFailure()) throw new TokenRequestFailed();
-    return new AuthToken(token.get(), parseLong(expiry.get()));
+    )) {
+      if (response.code() != 200) throw new TokenRequestFailed();
+      String responseBody = response.body().string();
+      Try<String> token = util.extractValue(responseBody, "Auth");
+      Try<String> expiry = util.extractValue(responseBody, "Expiry");
+      if (token.isFailure() || expiry.isFailure()) throw new TokenRequestFailed();
+      return new AuthToken(token.get(), parseLong(expiry.get()));
+    }
   }
 
   public static class TokenRequestFailed extends Exception {
