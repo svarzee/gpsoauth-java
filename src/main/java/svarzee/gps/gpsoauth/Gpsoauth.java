@@ -20,7 +20,7 @@ public class Gpsoauth {
   private final OkHttpClient httpClient;
 
   public Gpsoauth(OkHttpClient httpClient) {
-    this(httpClient, "gpsoauth/0.1");
+    this(httpClient, "gpsoauth");
   }
 
   public Gpsoauth(OkHttpClient httpClient, String userAgent) {
