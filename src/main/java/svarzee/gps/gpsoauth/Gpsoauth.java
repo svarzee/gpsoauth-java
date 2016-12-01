@@ -130,7 +130,6 @@ public class Gpsoauth {
                                String operatorCountry,
                                String lang,
                                String sdkVersion) throws IOException {
-    OkHttpClient httpClient = new OkHttpClient();
 
     FormBody formBody = new FormBody.Builder()
         .add("accountType", "HOSTED_OR_GOOGLE")
