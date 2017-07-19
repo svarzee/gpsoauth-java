@@ -19,22 +19,20 @@ public class Gpsoauth {
   private final Util util;
   private final CipherUtil cipherUtil;
   private final GpsoauthConfig config;
-  private final String userAgent;
   private final OkHttpClient httpClient;
 
+  public Gpsoauth() {
+    this(new OkHttpClient());
+  }
+
   public Gpsoauth(OkHttpClient httpClient) {
-    this(httpClient, "gpsoauth");
+    this(httpClient, new GpsoauthConfigFileFactory("gpsoauth.properties"));
   }
 
-  public Gpsoauth(OkHttpClient httpClient, String userAgent) {
-    this(httpClient, userAgent, new GpsoauthConfigFileFactory("gpsoauth.properties"));
-  }
-
-  public Gpsoauth(OkHttpClient httpClient, String userAgent, GpsoauthConfigFactory gpsoauthConfigFactory) {
+  public Gpsoauth(OkHttpClient httpClient, GpsoauthConfigFactory gpsoauthConfigFactory) {
     this.util = new Util();
     this.cipherUtil = new CipherUtil();
     this.config = gpsoauthConfigFactory.load();
-    this.userAgent = userAgent;
     this.httpClient = httpClient;
   }
 
@@ -92,7 +90,7 @@ public class Gpsoauth {
     Request request = new Request.Builder()
         .url("https://android.clients.google.com/auth")
         .post(formBody)
-        .header("User-Agent", userAgent)
+        .header("User-Agent", config.getUserAgent())
         .build();
 
     return httpClient.newCall(request).execute();
@@ -161,7 +159,7 @@ public class Gpsoauth {
     Request request = new Request.Builder()
         .url("https://android.clients.google.com/auth")
         .post(formBody)
-        .header("User-Agent", userAgent)
+        .header("User-Agent", config.getUserAgent())
         .build();
 
     return httpClient.newCall(request).execute();
