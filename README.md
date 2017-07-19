@@ -1,7 +1,7 @@
 Java client library for Google Play Services OAuth
 --------------------------------------------------
 
-Based on [gpsoauth](https://github.com/simon-weber/gpsoauth).
+Based on [gpsoauth](https://github.com/simon-weber/gpsoauth) by [Simon Weber](https://github.com/simon-weber).
 
 With this library you can log in using username and password.
 
