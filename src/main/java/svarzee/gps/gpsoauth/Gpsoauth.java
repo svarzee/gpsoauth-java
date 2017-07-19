@@ -1,23 +1,25 @@
 package svarzee.gps.gpsoauth;
 
-import java.io.IOException;
-
 import net.iharder.Base64;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import svarzee.gps.gpsoauth.config.GpsoauthConfig;
+import svarzee.gps.gpsoauth.config.GpsoauthConfigFactory;
+import svarzee.gps.gpsoauth.config.GpsoauthConfigFileFactory;
+
+import java.io.IOException;
 
 import static java.lang.Long.parseLong;
 import static net.iharder.Base64.URL_SAFE;
 
 public class Gpsoauth {
 
-  private final Util util = new Util();
-  private final CipherUtil cipherUtil = new CipherUtil();
-  private final GpsoauthConfig config = new GpsoauthConfig("gpsoauth.properties");
+  private final Util util;
+  private final CipherUtil cipherUtil;
+  private final GpsoauthConfig config;
   private final String userAgent;
-
   private final OkHttpClient httpClient;
 
   public Gpsoauth(OkHttpClient httpClient) {
@@ -25,8 +27,15 @@ public class Gpsoauth {
   }
 
   public Gpsoauth(OkHttpClient httpClient, String userAgent) {
-    this.httpClient = httpClient;
+    this(httpClient, userAgent, new GpsoauthConfigFileFactory("gpsoauth.properties"));
+  }
+
+  public Gpsoauth(OkHttpClient httpClient, String userAgent, GpsoauthConfigFactory gpsoauthConfigFactory) {
+    this.util = new Util();
+    this.cipherUtil = new CipherUtil();
+    this.config = gpsoauthConfigFactory.load();
     this.userAgent = userAgent;
+    this.httpClient = httpClient;
   }
 
   public AuthToken login(String username,
