@@ -1,5 +1,7 @@
 package svarzee.gps.gpsoauth;
 
+import java.io.IOException;
+
 import net.iharder.Base64;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -8,8 +10,6 @@ import okhttp3.Response;
 import svarzee.gps.gpsoauth.config.GpsoauthConfig;
 import svarzee.gps.gpsoauth.config.GpsoauthConfigFactory;
 import svarzee.gps.gpsoauth.config.GpsoauthConfigFileFactory;
-
-import java.io.IOException;
 
 import static java.lang.Long.parseLong;
 import static net.iharder.Base64.URL_SAFE;
