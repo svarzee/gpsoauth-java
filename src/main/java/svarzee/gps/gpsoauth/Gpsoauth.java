@@ -164,6 +164,12 @@ public class Gpsoauth {
     return httpClient.newCall(request).execute();
   }
 
+  /**
+   * If expiry is not received then its value defaults to -1.
+   *
+   * @throws IOException
+   * @throws TokenRequestFailed
+   */
   public AuthToken performOAuthForToken(String username,
                                         String masterToken,
                                         String androidId,
@@ -175,6 +181,12 @@ public class Gpsoauth {
     );
   }
 
+  /**
+   * If expiry is not received then its value defaults to -1.
+   *
+   * @throws IOException
+   * @throws TokenRequestFailed
+   */
   public AuthToken performOAuthForToken(String username,
                                         String masterToken,
                                         String androidId,
