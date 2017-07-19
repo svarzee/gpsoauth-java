@@ -40,9 +40,6 @@ public class Gpsoauth {
 
   /**
    * If expiry is not received then its value defaults to -1.
-   *
-   * @throws IOException
-   * @throws TokenRequestFailed
    */
   public AuthToken login(String username,
                          String password,
@@ -172,9 +169,6 @@ public class Gpsoauth {
 
   /**
    * If expiry is not received then its value defaults to -1.
-   *
-   * @throws IOException
-   * @throws TokenRequestFailed
    */
   public AuthToken performOAuthForToken(String username,
                                         String masterToken,
@@ -189,9 +183,6 @@ public class Gpsoauth {
 
   /**
    * If expiry is not received then its value defaults to -1.
-   *
-   * @throws IOException
-   * @throws TokenRequestFailed
    */
   public AuthToken performOAuthForToken(String username,
                                         String masterToken,
