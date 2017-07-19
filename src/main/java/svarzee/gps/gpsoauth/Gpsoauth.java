@@ -7,17 +7,19 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import svarzee.gps.gpsoauth.config.GpsoauthConfig;
+import svarzee.gps.gpsoauth.config.GpsoauthConfigFactory;
+import svarzee.gps.gpsoauth.config.GpsoauthConfigFileFactory;
 
 import static java.lang.Long.parseLong;
 import static net.iharder.Base64.URL_SAFE;
 
 public class Gpsoauth {
 
-  private final Util util = new Util();
-  private final CipherUtil cipherUtil = new CipherUtil();
-  private final GpsoauthConfig config = new GpsoauthConfig("gpsoauth.properties");
+  private final Util util;
+  private final CipherUtil cipherUtil;
+  private final GpsoauthConfig config;
   private final String userAgent;
-
   private final OkHttpClient httpClient;
 
   public Gpsoauth(OkHttpClient httpClient) {
@@ -25,10 +27,20 @@ public class Gpsoauth {
   }
 
   public Gpsoauth(OkHttpClient httpClient, String userAgent) {
-    this.httpClient = httpClient;
-    this.userAgent = userAgent;
+    this(httpClient, userAgent, new GpsoauthConfigFileFactory("gpsoauth.properties"));
   }
 
+  public Gpsoauth(OkHttpClient httpClient, String userAgent, GpsoauthConfigFactory gpsoauthConfigFactory) {
+    this.util = new Util();
+    this.cipherUtil = new CipherUtil();
+    this.config = gpsoauthConfigFactory.load();
+    this.userAgent = userAgent;
+    this.httpClient = httpClient;
+  }
+
+  /**
+   * If expiry is not received then its value defaults to -1.
+   */
   public AuthToken login(String username,
                          String password,
                          String androidId,
@@ -155,6 +167,9 @@ public class Gpsoauth {
     return httpClient.newCall(request).execute();
   }
 
+  /**
+   * If expiry is not received then its value defaults to -1.
+   */
   public AuthToken performOAuthForToken(String username,
                                         String masterToken,
                                         String androidId,
@@ -166,6 +181,9 @@ public class Gpsoauth {
     );
   }
 
+  /**
+   * If expiry is not received then its value defaults to -1.
+   */
   public AuthToken performOAuthForToken(String username,
                                         String masterToken,
                                         String androidId,
@@ -184,7 +202,7 @@ public class Gpsoauth {
       Try<String> token = util.extractValue(responseBody, "Auth");
       Try<String> expiry = util.extractValue(responseBody, "Expiry");
       if (token.isFailure() || expiry.isFailure()) throw new TokenRequestFailed();
-      return new AuthToken(token.get(), parseLong(expiry.get()));
+      return new AuthToken(token.get(), expiry.isFailure() ? -1 : parseLong(expiry.get()));
     }
   }
 

@@ -2,13 +2,14 @@ package svarzee.gps.gpsoauth
 
 import spock.lang.Shared
 import spock.lang.Specification
+import svarzee.gps.gpsoauth.config.GpsoauthConfigFileFactory
 
 class CipherUtilSpec extends Specification {
 
     @Shared
     def cipherUtil = new CipherUtil()
     @Shared
-    def config = new GpsoauthConfig("gpsoauth.properties")
+    def config = new GpsoauthConfigFileFactory("gpsoauth.properties").load()
 
     def "should not fail when creating a signature"() {
         when:
