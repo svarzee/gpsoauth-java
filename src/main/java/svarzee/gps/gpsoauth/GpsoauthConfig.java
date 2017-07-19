@@ -10,13 +10,13 @@ class GpsoauthConfig {
   private final BigInteger exponent;
 
   GpsoauthConfig(String configFile) {
-    Properties properties = getProperties();
+    Properties properties = getProperties(configFile);
     this.modulus = new BigInteger(properties.getProperty("modulus"));
     this.exponent = new BigInteger(properties.getProperty("exponent"));
   }
 
-  private Properties getProperties() {
-    try (final InputStream stream = this.getClass().getClassLoader().getResourceAsStream("gpsoauth.properties")) {
+  private Properties getProperties(String configFile) {
+    try (final InputStream stream = this.getClass().getClassLoader().getResourceAsStream(configFile)) {
       final Properties properties = new Properties();
       properties.load(stream);
       return properties;
