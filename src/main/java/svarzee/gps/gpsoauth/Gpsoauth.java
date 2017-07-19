@@ -38,6 +38,12 @@ public class Gpsoauth {
     this.httpClient = httpClient;
   }
 
+  /**
+   * If expiry is not received then its value defaults to -1.
+   *
+   * @throws IOException
+   * @throws TokenRequestFailed
+   */
   public AuthToken login(String username,
                          String password,
                          String androidId,
