@@ -1,6 +1,5 @@
 package svarzee.gps.gpsoauth
 
-import okhttp3.OkHttpClient
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -10,7 +9,7 @@ import static svarzee.gps.gpsoauth.test.TestUtil.TEST_PROPS
 class GpsoauthSpec extends Specification {
 
     @Shared
-    Gpsoauth gpsoauth = new Gpsoauth(new OkHttpClient())
+    Gpsoauth gpsoauth = new Gpsoauth()
     @Shared
     String validUsername = TEST_PROPS.validUsername
     @Shared

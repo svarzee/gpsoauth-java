@@ -22,7 +22,8 @@ public class GpsoauthConfigFileFactory implements GpsoauthConfigFactory {
     Properties properties = getProperties(configFile);
     BigInteger modulus = new BigInteger(properties.getProperty("modulus"));
     BigInteger exponent = new BigInteger(properties.getProperty("exponent"));
-    return new GpsoauthConfig(modulus, exponent);
+    String userAgent = properties.getProperty("user-agent");
+    return new GpsoauthConfig(modulus, exponent, userAgent);
   }
 
   private Properties getProperties(String configFile) {
