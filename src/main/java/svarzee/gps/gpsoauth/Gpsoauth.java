@@ -1,6 +1,9 @@
 package svarzee.gps.gpsoauth;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
 
 import net.iharder.Base64;
 import okhttp3.FormBody;
@@ -10,6 +13,7 @@ import okhttp3.Response;
 import svarzee.gps.gpsoauth.config.GpsoauthConfig;
 import svarzee.gps.gpsoauth.config.GpsoauthConfigFactory;
 import svarzee.gps.gpsoauth.config.GpsoauthConfigFileFactory;
+import xxx.sun.security.ssl.SSLSocketFactoryImpl;
 
 import static java.lang.Long.parseLong;
 import static net.iharder.Base64.URL_SAFE;
@@ -21,8 +25,56 @@ public class Gpsoauth {
   private final GpsoauthConfig config;
   private final OkHttpClient httpClient;
 
+  private static X509TrustManager trustManager(SSLSocketFactory sslSocketFactory) {
+    try {
+      Class<?> sslContextClass = Class.forName("xxx.sun.security.ssl.SSLContextImpl");
+      Object context = readFieldOrNull(sslSocketFactory, sslContextClass, "context");
+      if (context == null) throw new IllegalStateException("Failed to create X509TrustManager.");
+      X509TrustManager trustManager = readFieldOrNull(context, X509TrustManager.class, "trustManager");
+      if (trustManager == null) throw new IllegalStateException("Failed to create X509TrustManager.");
+      return trustManager;
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException("Failed to create X509TrustManager.");
+    }
+  }
+
+  private static <T> T readFieldOrNull(Object instance, Class<T> fieldType, String fieldName) {
+    for (Class<?> c = instance.getClass(); c != Object.class; c = c.getSuperclass()) {
+      try {
+        Field field = c.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        Object value = field.get(instance);
+        if (value == null || !fieldType.isInstance(value)) return null;
+        return fieldType.cast(value);
+      } catch (NoSuchFieldException ignored) {
+        // ignore
+      } catch (Exception e) {
+        throw new AssertionError();
+      }
+    }
+    if (!fieldName.equals("delegate")) {
+      Object delegate = readFieldOrNull(instance, Object.class, "delegate");
+      if (delegate != null) return readFieldOrNull(delegate, fieldType, fieldName);
+    }
+
+    return null;
+  }
+
+  private static OkHttpClient createOkHttpClient() {
+    SSLSocketFactoryImpl sslSocketFactory;
+    try {
+      sslSocketFactory = new SSLSocketFactoryImpl();
+    } catch (Exception e) {
+      throw new IllegalStateException("Failed to create SSLSocketFactoryImpl.");
+    }
+    return new OkHttpClient
+        .Builder()
+        .sslSocketFactory(sslSocketFactory, trustManager(sslSocketFactory))
+        .build();
+  }
+
   public Gpsoauth() {
-    this(new OkHttpClient());
+    this(createOkHttpClient());
   }
 
   public Gpsoauth(OkHttpClient httpClient) {

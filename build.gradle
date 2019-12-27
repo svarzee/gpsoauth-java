@@ -1,5 +1,5 @@
 group 'svarzee.gps'
-version '0.5.0'
+version '0.6.0'
 
 apply plugin: 'java'
 apply plugin: 'groovy'
@@ -21,3 +21,5 @@ dependencies {
 checkstyle {
     toolVersion = '7.0'
 }
+
+checkstyleMain.exclude '**/xxx/sun/security/**'

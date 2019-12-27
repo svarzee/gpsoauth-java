@@ -1,11 +1,13 @@
 package svarzee.gps.gpsoauth
 
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
 import static svarzee.gps.gpsoauth.Gpsoauth.TokenRequestFailed
 import static svarzee.gps.gpsoauth.test.TestUtil.TEST_PROPS
 
+@Ignore
 class GpsoauthSpec extends Specification {
 
     @Shared
