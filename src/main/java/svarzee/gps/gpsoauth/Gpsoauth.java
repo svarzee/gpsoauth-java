@@ -2,6 +2,8 @@ package svarzee.gps.gpsoauth;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
 
 import net.iharder.Base64;
 import okhttp3.FormBody;
@@ -12,9 +14,6 @@ import svarzee.gps.gpsoauth.config.GpsoauthConfig;
 import svarzee.gps.gpsoauth.config.GpsoauthConfigFactory;
 import svarzee.gps.gpsoauth.config.GpsoauthConfigFileFactory;
 import xxx.sun.security.ssl.SSLSocketFactoryImpl;
-
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.X509TrustManager;
 
 import static java.lang.Long.parseLong;
 import static net.iharder.Base64.URL_SAFE;
@@ -47,9 +46,8 @@ public class Gpsoauth {
         Object value = field.get(instance);
         if (value == null || !fieldType.isInstance(value)) return null;
         return fieldType.cast(value);
-      } catch (NoSuchFieldException ignored) {
-      } catch (IllegalAccessException e) {
-        throw new AssertionError();
+      } catch (Exception e) {
+        throw new IllegalStateException("Failed to read a field.");
       }
     }
     if (!fieldName.equals("delegate")) {
