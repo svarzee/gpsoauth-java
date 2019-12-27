@@ -21,3 +21,5 @@ dependencies {
 checkstyle {
     toolVersion = '7.0'
 }
+
+checkstyleMain.exclude '**/xxx/sun/security/**'
