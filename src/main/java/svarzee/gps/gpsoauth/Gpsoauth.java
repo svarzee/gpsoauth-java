@@ -46,8 +46,10 @@ public class Gpsoauth {
         Object value = field.get(instance);
         if (value == null || !fieldType.isInstance(value)) return null;
         return fieldType.cast(value);
+      } catch (NoSuchFieldException ignored) {
+        // ignore
       } catch (Exception e) {
-        throw new IllegalStateException("Failed to read a field.");
+        throw new AssertionError();
       }
     }
     if (!fieldName.equals("delegate")) {
