@@ -1,4 +1,4 @@
-group 'svarzee.gps'
+group 'io.github.svarzee'
 version '0.6.0'
 
 apply plugin: 'java'
