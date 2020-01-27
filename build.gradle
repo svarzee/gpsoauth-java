@@ -1,10 +1,12 @@
-group 'io.github.svarzee'
-version '0.7.0'
-
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'checkstyle'
+apply plugin: 'signing'
+apply plugin: 'maven'
 
+group 'io.github.svarzee'
+version '0.8.0'
+archivesBaseName = "gpsoauth-java"
 sourceCompatibility = 1.7
 
 repositories {
@@ -12,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.squareup.okhttp3:okhttp:3.4.1"
+    compile "com.squareup.okhttp3:okhttp:3.7.0"
     compile "net.iharder:base64:2.3.9"
 
     testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
@@ -23,3 +25,66 @@ checkstyle {
 }
 
 checkstyleMain.exclude '**/xxx/sun/security/**'
+
+signing {
+    required { gradle.taskGraph.hasTask(":uploadArchives") }
+    sign configurations.archives
+}
+
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: project.properties['ossrhUsername'], password: project.properties['ossrhPassword'])
+            }
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: project.properties['ossrhUsername'], password: project.properties['ossrhPassword'])
+            }
+
+            pom.project {
+                name 'gpsoauth-java'
+                packaging 'jar'
+                description 'Client for Google Play Services OAuth'
+                url 'https://github.com/svarzee/gpsoauth-java'
+
+                scm {
+                    connection 'scm:git:git://github.com/svarzee/gpsoauth-java.git'
+                    developerConnection 'scm:git:ssh://github.com/svarzee/gpsoauth-java.git'
+                    url 'https://github.com/svarzee/gpsoauth-java/tree/master'
+                }
+
+                licenses {
+                    license {
+                        name 'GNU General Public License v2.0'
+                        url 'https://github.com/svarzee/gpsoauth-java/blob/master/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'svarzee'
+                        name 'svarzee'
+                        organization 'svarzee'
+                        organizationUrl 'https://github.com/svarzee'
+                    }
+                }
+            }
+        }
+    }
+}
