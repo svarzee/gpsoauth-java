@@ -27,6 +27,7 @@ checkstyle {
 checkstyleMain.exclude '**/xxx/sun/security/**'
 
 signing {
+    required { gradle.taskGraph.hasTask(":uploadArchives") }
     sign configurations.archives
 }
 
