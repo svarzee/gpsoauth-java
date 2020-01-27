@@ -5,7 +5,7 @@ apply plugin: 'signing'
 apply plugin: 'maven'
 
 group 'io.github.svarzee'
-version '0.8.0'
+version '0.9.1'
 archivesBaseName = "gpsoauth-java"
 sourceCompatibility = 1.7
 
