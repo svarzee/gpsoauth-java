@@ -6,16 +6,20 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
 import net.iharder.Base64;
+import okhttp3.CipherSuite;
+import okhttp3.ConnectionSpec;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.TlsVersion;
 import svarzee.gps.gpsoauth.config.GpsoauthConfig;
 import svarzee.gps.gpsoauth.config.GpsoauthConfigFactory;
 import svarzee.gps.gpsoauth.config.GpsoauthConfigFileFactory;
 import xxx.sun.security.ssl.SSLSocketFactoryImpl;
 
 import static java.lang.Long.parseLong;
+import static java.util.Collections.singletonList;
 import static net.iharder.Base64.URL_SAFE;
 
 public class Gpsoauth {
@@ -60,6 +64,28 @@ public class Gpsoauth {
     return null;
   }
 
+  private static ConnectionSpec validConnectionSpec() {
+    return new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+        .cipherSuites(
+            CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+            CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+            CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,
+            CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
+            CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+            CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+            CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+            CipherSuite.TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
+            CipherSuite.TLS_DHE_RSA_WITH_AES_256_CBC_SHA,
+            CipherSuite.TLS_RSA_WITH_AES_128_GCM_SHA256,
+            CipherSuite.TLS_RSA_WITH_AES_128_CBC_SHA,
+            CipherSuite.TLS_RSA_WITH_AES_256_CBC_SHA,
+            CipherSuite.TLS_RSA_WITH_3DES_EDE_CBC_SHA
+        )
+        .tlsVersions(TlsVersion.TLS_1_2)
+        .supportsTlsExtensions(true)
+        .build();
+  }
+
   private static OkHttpClient createOkHttpClient() {
     SSLSocketFactoryImpl sslSocketFactory;
     try {
@@ -69,6 +95,7 @@ public class Gpsoauth {
     }
     return new OkHttpClient
         .Builder()
+        .connectionSpecs(singletonList(validConnectionSpec()))
         .sslSocketFactory(sslSocketFactory, trustManager(sslSocketFactory))
         .build();
   }
