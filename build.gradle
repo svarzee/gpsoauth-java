@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.squareup.okhttp3:okhttp:3.7.0"
+    compile "com.squareup.okhttp3:okhttp:3.6.0"
     compile "net.iharder:base64:2.3.9"
 
     testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
