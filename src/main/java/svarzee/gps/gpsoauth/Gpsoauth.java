@@ -2,7 +2,6 @@ package svarzee.gps.gpsoauth;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
 import net.iharder.Base64;
@@ -29,26 +28,13 @@ public class Gpsoauth {
   private final GpsoauthConfig config;
   private final OkHttpClient httpClient;
 
-  private static X509TrustManager trustManager(SSLSocketFactory sslSocketFactory) {
-    try {
-      Class<?> sslContextClass = Class.forName("xxx.sun.security.ssl.SSLContextImpl");
-      Object context = readFieldOrNull(sslSocketFactory, sslContextClass, "context");
-      if (context == null) throw new IllegalStateException("Failed to create X509TrustManager.");
-      X509TrustManager trustManager = readFieldOrNull(context, X509TrustManager.class, "trustManager");
-      if (trustManager == null) throw new IllegalStateException("Failed to create X509TrustManager.");
-      return trustManager;
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException("Failed to create X509TrustManager.");
-    }
-  }
-
   private static <T> T readFieldOrNull(Object instance, Class<T> fieldType, String fieldName) {
     for (Class<?> c = instance.getClass(); c != Object.class; c = c.getSuperclass()) {
       try {
         Field field = c.getDeclaredField(fieldName);
         field.setAccessible(true);
         Object value = field.get(instance);
-        if (value == null || !fieldType.isInstance(value)) return null;
+        if (!fieldType.isInstance(value)) return null;
         return fieldType.cast(value);
       } catch (NoSuchFieldException ignored) {
         // ignore
@@ -64,7 +50,7 @@ public class Gpsoauth {
     return null;
   }
 
-  private static ConnectionSpec validConnectionSpec() {
+  public static ConnectionSpec compatibleConnectionSpec() {
     return new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
         .cipherSuites(
             CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
@@ -86,22 +72,40 @@ public class Gpsoauth {
         .build();
   }
 
-  private static OkHttpClient createOkHttpClient() {
+  public static SSLSocketFactoryImpl compatibleSslFactory() {
     SSLSocketFactoryImpl sslSocketFactory;
     try {
       sslSocketFactory = new SSLSocketFactoryImpl();
     } catch (Exception e) {
       throw new IllegalStateException("Failed to create SSLSocketFactoryImpl.");
     }
+    return sslSocketFactory;
+  }
+
+  public static X509TrustManager compatibleTrustManager(SSLSocketFactoryImpl compatibleSslFactory) {
+    try {
+      Class<?> sslContextClass = Class.forName("xxx.sun.security.ssl.SSLContextImpl");
+      Object context = readFieldOrNull(compatibleSslFactory, sslContextClass, "context");
+      if (context == null) throw new IllegalStateException("Failed to create X509TrustManager.");
+      X509TrustManager trustManager = readFieldOrNull(context, X509TrustManager.class, "trustManager");
+      if (trustManager == null) throw new IllegalStateException("Failed to create X509TrustManager.");
+      return trustManager;
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException("Failed to create X509TrustManager.");
+    }
+  }
+
+  private static OkHttpClient compatibleOkHttpClient() {
+    SSLSocketFactoryImpl sslSocketFactory = compatibleSslFactory();
     return new OkHttpClient
         .Builder()
-        .connectionSpecs(singletonList(validConnectionSpec()))
-        .sslSocketFactory(sslSocketFactory, trustManager(sslSocketFactory))
+        .connectionSpecs(singletonList(compatibleConnectionSpec()))
+        .sslSocketFactory(sslSocketFactory, compatibleTrustManager(sslSocketFactory))
         .build();
   }
 
   public Gpsoauth() {
-    this(createOkHttpClient());
+    this(compatibleOkHttpClient());
   }
 
   public Gpsoauth(OkHttpClient httpClient) {
