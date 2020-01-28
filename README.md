@@ -14,6 +14,7 @@ AuthToken token = new Gpsoauth().login("username", "password", "androidId", "ser
 Known issues
 ------------
 It seems google is very strict about SSL communication and any changes to it make it fail.
+
 It is recommended to use `Gpsoauth.compatibleOkHttpClient` to create `OkHttpClient` instance with proper SSL settings.
 
 Using jdk other than hotspot 1.8.0_231 or openjdk 1.8.0_212 may introduce SSL implementation problems.
